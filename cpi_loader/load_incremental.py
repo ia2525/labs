@@ -11,4 +11,7 @@ def load_incremental(vintage_col):
     df_new = df[~df["date"].isin(df_existing["date"])]
 
     if not df_new.empty:
-        con.execute("INSERT INTO cpi_inc SELECT * FROM df_new", {"df_new": df_new})
+        # Register df_new as a temporary table so DuckDB can query it
+        con.register("df_temp", df_new)
+        con.execute("INSERT INTO cpi_inc SELECT * FROM df_temp")
+        con.unregister("df_temp")
