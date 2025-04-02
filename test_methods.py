@@ -4,7 +4,7 @@ from cpi_loader.load_incremental import load_incremental
 import duckdb
 
 # Choose the CPI vintage column to test
-vintage = "PCPI24M1"
+vintage = "PCPI25M2" # I am manipulating this line each time to pull vintages from the excel file & add to my database
 
 # --- Run APPEND method ---
 print("Running APPEND method:")
