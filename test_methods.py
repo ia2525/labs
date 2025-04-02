@@ -3,37 +3,26 @@ from cpi_loader.load_trunc import load_trunc
 from cpi_loader.load_incremental import load_incremental
 import duckdb
 
-# Define pull dates to simulate multiple script runs
-pull_dates = ["2004-01-15", "2004-02-15"]
+# Choose the CPI vintage column to test
+vintage = "PCPI24M1"
 
 # --- Run APPEND method ---
 print("Running APPEND method:")
-for date in pull_dates:
-    print(f"  Loading data for {date}")
-    load_append(date)
+load_append(vintage)
 
-# --- Run TRUNCATE method ---
-print("\nRunning TRUNC method:")
-for date in pull_dates:
-    print(f"  Loading data for {date}")
-    load_trunc(date)
+# --- Run TRUNC method ---
+print("Running TRUNC method:")
+load_trunc(vintage)
 
 # --- Run INCREMENTAL method ---
-print("\nRunning INCREMENTAL method:")
-for date in pull_dates:
-    print(f"  Loading data for {date}")
-    load_incremental(date)
+print("Running INCREMENTAL method:")
+load_incremental(vintage)
 
-# --- Inspect results ---
+# --- Inspect the result ---
 con = duckdb.connect("duckdb_cpi.db")
 
-print("\n=== Table Row Counts ===")
-for method in ["append", "trunc", "inc"]:
-    query = f"""
-        SELECT 
-            COUNT(*) AS total_rows, 
-            COUNT(DISTINCT date) AS unique_dates 
-        FROM cpi_{method}
-    """
-    print(f"cpi_{method}:")
-    print(con.execute(query).fetchdf())
+print("\n=== Row counts after loading ===")
+for table in ["cpi_append", "cpi_trunc", "cpi_inc"]:
+    result = con.execute(f"SELECT COUNT(*) AS rows, COUNT(DISTINCT date) AS unique_dates FROM {table}").fetchdf()
+    print(f"{table}:")
+    print(result, "\n")
